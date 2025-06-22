@@ -1,0 +1,30 @@
+{
+  "default_vehicle_type_name": "Turismo Ligero",
+  "vehicle_types": [
+    {
+      "name": "Turismo Ligero",
+      "slot_occupation": 1.0,
+      "description": "Vehículo estándar, ocupa 1 plaza."
+    },
+    {
+      "name": "Turismo Pesado",
+      "slot_occupation": 1.1,
+      "description": "Vehículo más grande o pesado, ocupa 1.1 plazas."
+    },
+    {
+      "name": "Vehículo 4x4",
+      "slot_occupation": 1.2,
+      "description": "Todoterreno, ocupa 1.2 plazas."
+    },
+    {
+      "name": "Furgón",
+      "slot_occupation": 1.5,
+      "description": "Vehículo comercial ligero, ocupa 1.5 plazas."
+    },
+    {
+      "name": "Sobredimensionado",
+      "slot_occupation": 2.0,
+      "description": "Vehículo grande o especial, ocupa 2 plazas."
+    }
+  ]
+}
