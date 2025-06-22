@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calculadora transporte con lista y precios individuales</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<!-- Google Fonts - Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- Custom CSS -->
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=gfRy9BJsVqe7Cqn04yPzQcB3qI6G0WqGhID7vRTPWMKzowp6gdjsGNDH79bDNg_dImuW2Ir_9NWmv3qPsjBhMMIRNWey-VtiCUTTKS-eA2BRMHMbZTa-LPzLdGiSax8K77GJZB7apY_t4pfii6N_3q1OIJpHVPBvoAKzuCnsBoPk7-NOuMCTripCGg1N_SAbgIWHti0sG1g6H5wB9oTfkA" charset="UTF-8"></script><style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5; /* Fondo claro y suave */
+    color: #333;
+    line-height: 1.6;
+  }
+  .container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  h1, h3, h4 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .form-label {
+    font-weight: 400;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    box-shadow: none;
+    transition: all 0.2s ease-in-out;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #6a90ff; /* Un azul más vibrante en focus */
+    box-shadow: 0 0 0 0.2rem rgba(106, 144, 255, 0.25);
+  }
+
+  .btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none; /* Eliminar el borde por defecto de Bootstrap */
+  }
+
+  .btn i {
+      margin-right: 8px; /* Espacio entre el icono y el texto */
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, #6a90ff, #3467ff);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(45deg, #3467ff, #6a90ff);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-warning {
+    background-color: #ffc107;
+    color: #333;
+  }
+  .btn-warning:hover {
+    background-color: #e0a800;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-info {
+    background-color: #17a2b8;
+    color: white;
+  }
+  .btn-info:hover {
+    background-color: #138496;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+  .btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Autocomplete styles */
+  .autocomplete-items {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ced4da;
+    border-top: none;
+    max-height: 250px; /* Un poco más de espacio */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .autocomplete-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .autocomplete-item:hover {
+    background-color: #eef1f5;
+  }
+  .position-relative { position: relative; }
+
+  /* Map styles */
+  #map {
+    height: 500px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Custom icon for load display on map */
+  .load-icon {
+    background-color: #2c3e50; /* Dark blue-grey, matches text headers */
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid white;
+  }
+  /* Optional: differentiate colors based on load level, if needed in the future */
+  .load-icon.high-load {
+      background-color: #dc3545; /* Red for high load */
+  }
+  .load-icon.medium-load {
+      background-color: #ffc107; /* Orange for medium load */
+      color: #333; /* Darker text for orange background */
+  }
+
+
+  /* List styles */
+  #lista-transportes .list-group-item {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e6ed;
+    background-color: #fdfdfd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  #lista-transportes .list-group-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+  .precio-vehiculo, .espacio-vehiculo, .matricula-item { /* Clase para los inputs en el modal de precios */
+    max-width: 100px;
+  }
+  /* Estilo para los botones de la lista */
+  .list-item-buttons {
+    display: flex;
+    gap: 8px; /* Espacio entre los botones */
+  }
+  /* Estilo para el área de detalles de rentabilidad */
+  .profitability-details {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #eef1f5;
+    border: 1px solid #d4dae2;
+    border-radius: 8px;
+    font-size: 0.9em;
+    display: none; /* Oculto por defecto */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .profitability-details p {
+    margin-bottom: 5px;
+  }
+  .profitability-details ul {
+    margin-top: 10px;
+    padding-left: 20px;
+  }
+  .profitability-details ul li {
+    margin-bottom: 5px;
+  }
+  /* Estilos para SortableJS */
+  .sortable-ghost {
+    opacity: 0.6;
+    background-color: #e2e6ea;
+    border: 1px dashed #6a90ff;
+  }
+  .sortable-chosen {
+    border: 2px solid #6a90ff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .total-profitability-section {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #d1e7dd; /* Un color de fondo para destacar */
+    border: 1px solid #badbcc;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  }
+  .total-profitability-section h4 {
+    margin-bottom: 10px;
+    color: #0f5132;
+  }
+  .capacity-warning {
+    color: #dc3545; /* Rojo de Bootstrap para errores */
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  /* Modals */
+  .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  .modal-header {
+    border-bottom: 1px solid #e0e6ed;
+    background-color: #f8f9fa;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  .modal-footer {
+    border-top: 1px solid #e0e6ed;
+  }
+
+  #fullScreenMap {
+      width: 100%;
+      height: 80vh; /* 80% de la altura del viewport para el mapa grande */
+  }
+
+  /* Progress bar for truck occupancy */
+  .truck-occupancy-bar {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #e0e6ed; /* Fondo claro para la barra */
+    border-radius: 10px;
+    height: 30px;
+    overflow: hidden; /* Asegura que el contenido se mantenga dentro de las esquinas redondeadas */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  .truck-occupancy-progress {
+    height: 100%;
+    width: 0%; /* Se establecerá por JS */
+    background-color: #28a745; /* Verde por defecto */
+    border-radius: 10px; /* Coincide con el padre */
+    transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9em;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .truck-occupancy-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      line-height: 30px; /* Centrar texto verticalmente */
+      color: #333;
+      font-weight: 600;
+      z-index: 1; /* Asegura que el texto esté encima de la barra de progreso */
+      text-shadow: 0 1px 1px rgba(255,255,255,0.7); /* Sombra sutil para legibilidad */
+  }
+
+  .truck-occupancy-progress.bg-warning {
+    background-color: #ffc107;
+  }
+  .truck-occupancy-progress.bg-danger {
+    background-color: #dc3545;
+  }
+  /* Estilo para mensajes de lista vacía */
+  .empty-list-message {
+      color: #6c757d;
+      padding: 15px;
+      border: 1px dashed #dee2e6;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      margin-top: 20px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 767.98px) {
+    .col-md-5, .col-md-7 {
+      margin-bottom: 20px; /* Espacio entre columnas apiladas */
+    }
+    .container {
+      padding: 20px;
+    }
+    #map {
+      height: 350px; /* Ajuste de altura para móviles */
+    }
+    /* Botones de ancho completo en pantallas pequeñas */
+    .btn.flex-grow-1 {
+      width: 100%;
+    }
+    .list-item-buttons {
+        flex-direction: column; /* Apilar botones en la lista */
+    }
+  }
+</style>
+</head>
+<body class="p-4">
+<div class="container">
+  <h1 class="mb-4 text-center">Calculadora de Rutas y Cargas</h1>
+  <div class="row">
+    <div class="col-12 col-md-5"> <!-- Columna para el formulario: más estrecha -->
+      <form id="form" autocomplete="off">
+        <div class="row g-2 mb-2">
+          <div class="col-12 position-relative">
+            <label for="origen" class="form-label"><i class="fas fa-map-marker-alt"></i> Origen</label>
+            <input type="text" id="origen" class="form-control form-control-sm" placeholder="Ej: Madrid" required />
+            <div id="origen-list" class="autocomplete-items"></div>
+          </div>
+          <div class="col-12 position-relative">
+            <label for="destino" class="form-label"><i class="fas fa-map-marker-alt"></i> Destino</label>
+            <input type="text" id="destino" class="form-control form-control-sm" placeholder="Ej: Granada" required />
+            <div id="destino-list" class="autocomplete-items"></div>
+          </div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-12">
+            <label for="distanciaKm" class="form-label"><i class="fas fa-route"></i> Distancia (km)</label>
+            <input type="number" id="distanciaKm" class="form-control form-control-sm" readonly />
+          </div>
+        </div>
+        <!-- Agrupación de inputs numéricos en parejas, incluyendo el nuevo campo para espacio por ítem -->
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-md-6">
+            <label for="vehiculos" class="form-label"><i class="fas fa-car"></i> Ítems</label>
+            <input type="number" id="vehiculos" class="form-control form-control-sm" min="1" max="50" value="1" required />
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="espacioPorVehiculo" class="form-label"><i class="fas fa-cube"></i> Espacio total (carga)</label>
+            <input type="number" id="espacioPorVehiculo" class="form-control form-control-sm" min="0.1" step="0.1" value="1" required readonly />
+          </div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-md-6">
+            <label for="truckSlots" class="form-label"><i class="fas fa-truck-ramp-box"></i> Capacidad camión (carga)</label>
+            <input type="number" id="truckSlots" class="form-control form-control-sm" min="1" value="8" required />
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="coste100km" class="form-label"><i class="fas fa-gas-pump"></i> Coste 100 km (€)</label>
+            <input type="number" id="coste100km" class="form-control form-control-sm" min="0" step="0.01" value="170" required />
+          </div>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-12">
+            <label for="precioTransporte" class="form-label"><i class="fas fa-hand-holding-dollar"></i> Precio total (€)</label>
+            <input type="number" id="precioTransporte" class="form-control form-control-sm" min="0" step="0.01" value="300" required readonly />
+          </div>
+        </div>
+
+        <!-- BOTÓN PARA ACTUALIZAR PRECIOS -->
+        <div class="mb-3">
+          <button type="button" id="btn-actualizar-precios" class="btn btn-warning btn-sm w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Edita los precios y el espacio ocupado por cada ítem/paquete."><i class="fas fa-edit"></i> Editar Precios/Espacios</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Calcula la rentabilidad del transporte actual."><i class="fas fa-calculator"></i> Calcular</button>
+      </form>
+    </div>
+    <div class="col-12 col-md-7"> <!-- Columna para el mapa: más ancha -->
+      <div id="map"></div>
+      <!-- Botón para abrir el mapa en pantalla completa -->
+      <button type="button" class="btn btn-info btn-sm w-100 mt-2" data-bs-toggle="modal" data-bs-target="#fullScreenMapModal" title="Amplía el mapa para ver la ruta en detalle."><i class="fas fa-expand-alt"></i> Ver Mapa</button>
+    </div>
+  </div>
+
+
+  <div id="resultado" class="mt-3"></div>
+
+  <hr class="my-4"/>
+
+  <!-- Nueva barra de estado de ocupación del camión -->
+  <h3 class="mb-3">Ocupación actual del camión</h3>
+  <div class="truck-occupancy-bar">
+    <div class="truck-occupancy-progress" id="truckOccupancyProgressBar"></div>
+    <div class="truck-occupancy-text" id="truckOccupancyText">0 / 8 carga (0%)</div>
+  </div>
+  <hr class="my-4"/>
+
+
+  <div class="mb-3 d-flex flex-wrap gap-2 justify-content-center">
+    <button id="btn-anadir" class="btn btn-success btn-sm flex-grow-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Añade el transporte actual a la lista para calcular la rentabilidad global."><i class="fas fa-plus-circle"></i> Añadir a lista</button>
+    <button id="btn-optimizar" class="btn btn-warning btn-sm flex-grow-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Optimiza el orden de los transportes en la lista para una ruta más eficiente."><i class="fas fa-route"></i> Optimizar Ruta</button>
+    <button id="btn-reset-optimizado" class="btn btn-outline-secondary btn-sm flex-grow-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Restablece la vista del mapa a la ruta actual no optimizada."><i class="fas fa-undo-alt"></i> Restablecer Mapa</button>
+    <button id="btn-descargar" class="btn btn-primary btn-sm flex-grow-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Descarga la lista de transportes actual como archivo JSON."><i class="fas fa-download"></i> Descargar JSON</button>
+    <button id="btn-cargar" class="btn btn-secondary btn-sm flex-grow-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Carga una lista de transportes desde un archivo JSON."><i class="fas fa-upload"></i> Cargar JSON</button>
+    <input type="file" id="input-cargar" accept=".json" style="display:none" />
+  </div>
+
+  <h3 class="mb-3">Ruta Planificada:</h3>
+  <ul id="lista-transportes" class="list-group"></ul>
+
+  <!-- Sección para la rentabilidad total de la ruta -->
+  <div id="total-route-profitability" class="total-profitability-section" style="display: none;">
+    <h4 class="text-center">Resumen de la Ruta</h4>
+    <p><strong>Distancia total de la ruta:</strong> <span id="total-distance"></span> km</p>
+    <p><strong>Coste estimado de camiones:</strong> €<span id="total-truck-cost"></span></p>
+    <p><strong>Precio total de transportes:</strong> €<span id="total-transport-price"></span></p>
+    <p><strong>Máxima carga simultánea:</strong> <span id="total-vehicles-transported"></span> carga transportada</p>
+    <p><strong>Total de ítems transportados:</strong> <span id="total-items-count"></span> ítems</p>
+    <p><strong>Capacidad del camión:</strong> <span id="truck-slots-display"></span> carga</p>
+    <p><strong>Porcentaje de ocupación (pico):</strong> <span id="utilization-percentage"></span>%</p>
+    <p id="capacity-warning-message" class="capacity-warning" style="display: none;">
+      <i class="fas fa-exclamation-triangle"></i> ¡Atención! La máxima carga simultánea (${'<span id="max-load-warning-display"></span>'} carga) excede la capacidad del camión. Esta ruta (tal como está ordenada) requeriría múltiples viajes o una gestión de carga y descarga más compleja.
+    </p>
+    <p><strong>Beneficio total de la ruta:</strong> €<span id="total-route-benefit"></span></p>
+    <p><strong>Beneficio promedio por ítem (individual):</strong> €<span id="average-vehicle-benefit"></span></p>  </div>
+</div>
+
+<!-- Modal para introducir precios individuales y espacio por ítem -->
+<div class="modal fade" id="modalPrecios" tabindex="-1" aria-labelledby="modalPreciosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg"> <!-- Changed to modal-lg for more space -->
+    <div class="modal-content">
+      <form id="formPrecios">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalPreciosLabel">Precios y Espacios individuales por ítem</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body" id="modal-body-precios">
+          <!-- Contenido dinámico de inputs de precio y espacio -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" title="Cierra esta ventana sin guardar cambios."><i class="fas fa-times-circle"></i> Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Guarda los precios y espacios individuales."><i class="fas fa-save"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para reemplazar alert() -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feedbackModalLabel">Aviso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="feedbackModalBody">
+        <!-- Mensaje aquí -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" title="Cierra esta ventana de aviso."><i class="fas fa-check-circle"></i> Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARA EL MAPA EN GRANDE -->
+<div class="modal fade" id="fullScreenMapModal" tabindex="-1" aria-labelledby="fullScreenMapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen"> <!-- Utiliza modal-fullscreen para pantalla completa -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fullScreenMapModalLabel">Mapa de la Ruta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="fullScreenMap"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" title="Cierra la vista ampliada del mapa."><i class="fas fa-times"></i> Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Custom JavaScript -->
+<script>
+  const proxyUrl = 'https://desarrollador.juanjuguera.com/proxy.php'; // URL del proxy
+  const vehicleTypesConfigUrl = './json/type_vehicle.json'; // URL del archivo JSON de tipos de vehículo
+  let vehicleTypesData = null; // Almacenará los datos del JSON de tipos de vehículo
+  let defaultVehicleType = null; // Almacenará el tipo de vehículo por defecto
+
+  // Fallback data for vehicle types if loading from URL fails (e.g., when run locally)
+  const fallbackVehicleTypesData = {
+    "default_vehicle_type_name": "Turismo Ligero",
+    "vehicle_types": [
+      { "name": "Turismo Ligero", "slot_occupation": 1.0, "description": "Vehículo estándar, ocupa 1 plaza." },
+      { "name": "Turismo Pesado", "slot_occupation": 1.1, "description": "Vehículo más grande o pesado, ocupa 1.1 plazas." },
+      { "name": "Vehículo 4x4", "slot_occupation": 1.2, "description": "Todoterreno, ocupa 1.2 plazas." },
+      { "name": "Furgón", "slot_occupation": 1.5, "description": "Vehículo comercial ligero, ocupa 1.5 plazas." },
+      { "name": "Sobredimensionado", "slot_occupation": 2.0, "description": "Vehículo grande o especial, ocupa 2 plazas." }
+    ]
+  };
+
+  const coords = { origen: null, destino: null };
+  let ultimoCalculo = null;
+  let transportes = [];
+  let sortableInstance = null; // Para almacenar la instancia de SortableJS
+
+  const modalPreciosEl = document.getElementById('modalPrecios');
+  const modalPrecios = new bootstrap.Modal(modalPreciosEl);
+  const modalBodyPrecios = document.getElementById('modal-body-precios');
+  const formPrecios = document.getElementById('formPrecios');
+  const precioTransporteInput = document.getElementById('precioTransporte');
+  const truckSlotsInput = document.getElementById('truckSlots');
+  const vehiculosInput = document.getElementById('vehiculos'); // Ahora representa 'Número de ítems/paquetes'
+  const espacioPorVehiculoInput = document.getElementById('espacioPorVehiculo'); // Nuevo input para espacio por ítem por defecto
+
+  // New elements for truck occupancy bar
+  const truckOccupancyProgressBar = document.getElementById('truckOccupancyProgressBar');
+  const truckOccupancyText = document.getElementById('truckOccupancyText');
+
+  // Variable para el mapa en el modal
+  let fullScreenMap = null;
+  const fullScreenMapModalEl = document.getElementById('fullScreenMapModal');
+
+  // Variable global para almacenar el resultado de la última optimización
+  let currentOptimizedRouteData = null;
+
+  // Inicializar el mapa de Leaflet
+  const map = L.map('map').setView([40.416775, -3.703790], 6); // Centrado en Madrid, zoom 6
+
+  // Define base layers
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).on('tileerror', function(e) {
+      console.error('Error al cargar un tile del mapa principal (OpenStreetMap):', e);
+      showFeedbackModal('Se ha producido un error al cargar las imágenes del mapa principal. Por favor, verifica tu conexión a internet o intenta de nuevo más tarde.');
+  });
+
+  const esriSatLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 19
+  }).on('tileerror', function(e) {
+      console.error('Error al cargar un tile del mapa principal (Esri Satellite):', e);
+      showFeedbackModal('Se ha producido un error al cargar las imágenes de satélite del mapa. Por favor, verifica tu conexión a internet o intenta de nuevo más tarde.');
+  });
+
+  // Add OSM layer by default
+  osmLayer.addTo(map);
+
+  // Add layer control to the main map
+  const baseLayers = {
+      "Mapa (OpenStreetMap)": osmLayer,
+      "Satélite (Esri Imagery)": esriSatLayer
+  };
+
+  const overlays = {
+      // No overlays definidos por el momento
+  };
+
+  L.control.layers(baseLayers, overlays).addTo(map);
+
+  // Global Leaflet FeatureGroup para gestionar los elementos de la ruta (polilíneas y marcadores)
+  let routeLayers = L.featureGroup().addTo(map);
+
+  /**
+   * Muestra un modal de retroalimentación en lugar de alert().
+   * @param {string} message - El mensaje a mostrar.
+   * @param {string} type - El tipo de mensaje (info, success, danger, warning).
+   */
+  function showFeedbackModal(message, type='info') {
+    const feedbackModalEl = document.getElementById('feedbackModal');
+    const feedbackModal = new bootstrap.Modal(feedbackModalEl);
+    document.getElementById('feedbackModalLabel').textContent = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize first letter
+    document.getElementById('feedbackModalBody').textContent = message;
+    feedbackModalEl.querySelector('.modal-header').className = `modal-header bg-${type} text-white`; // Set header color
+    feedbackModal.show();
+  }
+
+  /**
+   * Realiza una solicitud al proxy para obtener la distancia entre dos puntos geográficos.
+   * @param {Object} start - Coordenadas de inicio ({lon, lat}).
+   * @param {Object} end - Coordenadas de destino ({lon, lat}).
+   * @returns {Promise<number>} La distancia en kilómetros.
+   */
+  async function getDistance(start, end) {
+    const body = {
+      action: 'direct_distance',
+      coordinates: [[start.lon, start.lat], [end.lon, end.lat]]
+    };
+    console.log('Sending direct_distance request to proxy with body:', JSON.stringify(body));
+    const resp = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      throw new Error(data.error || 'No se pudo calcular la distancia entre origen y destino.');
+    }
+    return (data.features ? data.features[0].properties.summary.distance : data.routes[0].summary.distance) / 1000;
+  }
+
+  /**
+   * Calcula la distancia total de una ruta compleja con múltiples waypoints usando el proxy.
+   * También devuelve la secuencia de coordenadas de la ruta.
+   * @param {Array<Array<number>>} coordinates - Un array de arrays [lon, lat] representando los waypoints de la ruta.
+   * @returns {Promise<{distance: number, path: Array<Array<number>>}>} La distancia total en kilómetros y la ruta como una array de coordenadas.
+   */
+  async function getOverallRouteDistance(coordinates) {
+      if (coordinates.length < 2) {
+          return { distance: 0, path: [] };
+      }
+      const body = {
+          action: 'route',
+          coordinates: coordinates,
+          geometry: true // Pedir la geometría
+      };
+      console.log('Sending route request to proxy with body:', JSON.stringify(body));
+      const resp = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+          throw new Error(data.error || 'No se pudo calcular la distancia total de la ruta.');
+      }
+
+      let totalDistance = 0;
+      let pathCoords = []; // Este array contendrá las coordenadas [lon, lat] directamente
+
+      if (data.routes && data.routes.length > 0 && data.routes[0].summary) {
+          totalDistance = data.routes[0].summary.distance / 1000;
+          if (data.routes[0].geometry && data.routes[0].geometry.coordinates) {
+              pathCoords = data.routes[0].geometry.coordinates; // Coordenadas [lon, lat]
+          } else {
+              console.warn("DEBUG: ORS response missing geometry.coordinates in routes[0].geometry:", data.routes[0].geometry);
+          }
+      } else if (data.features && data.features.length > 0 && data.features[0].properties && data.features[0].properties.summary) {
+          totalDistance = data.features[0].properties.summary.distance / 1000;
+          if (data.features[0].geometry && data.features[0].geometry.coordinates) {
+             pathCoords = data.features[0].geometry.coordinates; // Coordenadas [lon, lat]
+          } else {
+              console.warn("DEBUG: ORS response missing geometry.coordinates in features[0].geometry:", data.features[0].geometry);
+          }
+      } else {
+          throw new Error('Formato de respuesta inesperado del proxy para la ruta total.');
+      }
+      console.log("DEBUG: Coordenadas de la ruta obtenidas de ORS (lon, lat):", pathCoords);
+      return { distance: totalDistance, path: pathCoords };
+  }
+
+  /**
+   * Actualiza el campo de distancia y el estado del botón de añadir transporte.
+   */
+  async function actualizarDistancia() {
+    const distanciaInput = document.getElementById('distanciaKm');
+    const resultado = document.getElementById('resultado');
+    if (!coords.origen || !coords.destino) {
+      distanciaInput.value = '';
+      desactivarBotonAnadir();
+      return;
+    }
+    try {
+      resultado.innerHTML = 'Calculando distancia...';
+      const distancia = await getDistance(coords.origen, coords.destino);
+      distanciaInput.value = distancia.toFixed(2);
+      resultado.innerHTML = '';
+      // El botón de añadir se activa si hay distancia y un precio de transporte válido
+      if (distancia > 0 && parseFloat(precioTransporteInput.value) > 0) {
+        activarBotonAnadir();
+      } else {
+        desactivarBotonAnadir();
+      }
+    } catch (e) {
+      resultado.innerHTML = `<div class="alert alert-danger">${e.message}</div>`;
+      distanciaInput.value = '';
+      desactivarBotonAnadir();
+    }
+  }
+
+  /**
+   * Intenta extraer la localidad/ciudad de un objeto de propiedades de geocodificación.
+   * Prioriza 'county', luego 'city', luego 'locality', y finalmente intenta parsear 'label'.
+   * @param {Object} properties - El objeto properties de un feature de geocodificación de ORS.
+   * @returns {string} La localidad/ciudad extraída.
+   */
+  function getLocalityFromFeatureProperties(properties) {
+    if (properties.county) {
+      return properties.county;
+    }
+    if (properties.city) {
+      return properties.city;
+    }
+    if (properties.locality) {
+      return properties.locality;
+    }
+    // Fallback: parse from label if structured fields are missing
+    if (properties.label) {
+      const parts = properties.label.split(',').map(s => s.trim()).filter(s => s !== '');
+      // Try to get the second to last part (often city/municipality)
+      if (parts.length >= 2) {
+        const potentialLocality = parts[parts.length - 2];
+        if (!/^\d+$/.test(potentialLocality)) { // If not purely numeric
+          return potentialLocality;
+        }
+      }
+      // Otherwise, take the last significant part that's not country
+      if (parts.length > 0) {
+          let lastPart = parts[parts.length - 1];
+          // Remove common country names if they are the last part
+          if (lastPart.toLowerCase() === 'españa' || lastPart.toLowerCase() === 'spain') {
+              if (parts.length > 1) {
+                  lastPart = parts[parts.length - 2];
+              } else {
+                  return ''; // No useful locality found
+              }
+          }
+          // Further clean up for things that might be postal codes or house numbers
+          lastPart = lastPart.replace(/\b\d{5}\b/, '').trim(); // Remove 5-digit postal codes
+          if (lastPart.length > 0) return lastPart;
+      }
+    }
+    return ''; // Default empty
+  }
+
+
+  /**
+   * Creates the autocomplete functionality for origin and destination fields, using the proxy.
+   * @param {string} inputId - ID of the input field.
+   * @param {string} listId - ID of the div where suggestions will be displayed.
+   */
+  function crearAutoCompletar(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+
+    input.addEventListener('input', async () => {
+      coords[inputId] = null;
+      list.innerHTML = '';
+      document.getElementById('distanciaKm').value = '';
+      desactivarBotonAnadir();
+
+      const val = input.value.trim();
+      if (!val) return;
+
+      try {
+        const body = {
+          action: 'geocode',
+          query: val
+        };
+        console.log('Sending geocode request to proxy with body:', JSON.stringify(body));
+        const resp = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.error) {
+            throw new Error(data.error || 'Error en autocompletar.');
+        }
+
+        list.innerHTML = '';
+        data.features.forEach(feat => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          div.textContent = feat.properties.label; // Displays the full address in the suggestion
+          div.addEventListener('click', () => {
+            input.value = feat.properties.label;
+            coords[inputId] = {
+              lat: feat.geometry.coordinates[1],
+              lon: feat.geometry.coordinates[0],
+              label: feat.properties.label, // Stores the full address
+              locality: getLocalityFromFeatureProperties(feat.properties) // Stores the simplified locality
+            };
+            list.innerHTML = '';
+            actualizarDistancia();
+          });
+          list.appendChild(div);
+        });
+      } catch (e) {
+        list.innerHTML = '';
+        showFeedbackModal(`Error en autocompletar: ${e.message}`, 'danger');
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target !== input) list.innerHTML = '';
+    });
+  }
+
+  /**
+   * Enables the button to add transport to the list.
+   */
+  function activarBotonAnadir() {
+    document.getElementById('btn-anadir').disabled = false;
+  }
+
+  /**
+   * Disables the button to add transport to the list.
+   */
+  function desactivarBotonAnadir() {
+    document.getElementById('btn-anadir').disabled = true;
+  }
+
+  /**
+   * Displays a message in the results area.
+   * @param {string} texto - The message text.
+   * @param {string} tipo - The alert type (info, success, danger, warning).
+   */
+  function actualizarResultado(texto, tipo='info') {
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = `<div class="alert alert-${tipo}">${texto}</div>`;
+  }
+
+  /**
+   * Loads vehicle type configuration from the JSON file.
+   * Includes a fallback if the fetch fails (e.g., when run locally).
+   */
+  async function loadVehicleTypesConfig() {
+    try {
+      const response = await fetch(vehicleTypesConfigUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      vehicleTypesData = await response.json();
+      const defaultTypeName = vehicleTypesData.default_vehicle_type_name;
+      defaultVehicleType = vehicleTypesData.vehicle_types.find(type => type.name === defaultTypeName);
+
+      if (!defaultVehicleType) {
+        console.warn(`Tipo de vehículo por defecto "${defaultTypeName}" no encontrado. Usando el primer tipo.`);
+        defaultVehicleType = vehicleTypesData.vehicle_types[0] || { name: "Default", slot_occupation: 1.0 };
+      }
+    } catch (e) {
+      console.error('Error al cargar la configuración de tipos de vehículo (usando fallback):', e);
+      showFeedbackModal('Error al cargar la configuración de tipos de vehículo desde el servidor. Algunas funcionalidades podrían usar valores por defecto.', 'warning');
+      // Fallback to a predetermined vehicle type if JSON load fails
+      vehicleTypesData = fallbackVehicleTypesData;
+      defaultVehicleType = vehicleTypesData.vehicle_types.find(type => type.name === vehicleTypesData.default_vehicle_type_name) || vehicleTypesData.vehicle_types[0];
+    } finally {
+        // Always initialize the space input based on default settings, whether loaded or fallback
+        if (espacioPorVehiculoInput && vehiculosInput && defaultVehicleType) {
+            espacioPorVehiculoInput.value = (parseInt(vehiculosInput.value, 10) * defaultVehicleType.slot_occupation).toFixed(1);
+        }
+    }
+  }
+
+
+  /**
+   * Opens the modal to enter individual prices and item space.
+   */
+  function abrirModalPrecios() {
+    const numItems = parseInt(vehiculosInput.value, 10);
+
+    if (isNaN(numItems) || numItems < 1) {
+      showFeedbackModal('Introduce un número válido de ítems/paquetes para editar precios y espacios.', 'warning');
+      return;
+    }
+
+    modalBodyPrecios.innerHTML = '';
+    let itemsDetails = [];
+    try {
+      // Try to load item details from session to keep user changes
+      itemsDetails = JSON.parse(sessionStorage.getItem('itemsDetails')) || [];
+    } catch {
+      itemsDetails = [];
+    }
+
+    // Ensure itemsDetails has the correct size, initializing new ones with default values
+    while (itemsDetails.length < numItems) {
+        // Use the default vehicle type for new items
+        itemsDetails.push({
+            precio: parseFloat((parseFloat(precioTransporteInput.value) / numItems).toFixed(2)) || 0,
+            espacio: defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0, // Use default type space or 1.0
+            type: defaultVehicleType ? defaultVehicleType.name : "Default", // Assign default type name
+            matricula: '' // Initialize matricula as empty string
+        });
+    }
+    if (itemsDetails.length > numItems) {
+        itemsDetails = itemsDetails.slice(0, numItems);
+    }
+
+    itemsDetails.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'row mb-2 align-items-end'; // Alignment for everything to be on the same vertical line
+      
+      let optionsHtml = '';
+      const typesToDisplay = vehicleTypesData ? vehicleTypesData.vehicle_types : fallbackVehicleTypesData.vehicle_types;
+      if (typesToDisplay) {
+          typesToDisplay.forEach(type => {
+              const selected = item.type === type.name ? 'selected' : '';
+              optionsHtml += `<option value="${type.name}" data-slots="${type.slot_occupation}">${type.name}</option>`;
+          });
+      }
+
+      div.innerHTML = `
+        <div class="col-3">
+          <label for="tipoItem${i}" class="form-label">Ítem ${i + 1} - Tipo:</label>
+          <select id="tipoItem${i}" class="form-select form-select-sm">
+            ${optionsHtml}
+          </select>
+        </div>
+        <div class="col-3">
+          <label for="precioItem${i}" class="form-label">Precio (€):</label>
+          <input type="number" id="precioItem${i}" class="form-control form-control-sm precio-vehiculo" min="0" step="0.01" value="${item.precio.toFixed(2)}" required />
+        </div>
+        <div class="col-3">
+          <label for="espacioItem${i}" class="form-label">Espacio (carga):</label>
+          <input type="number" id="espacioItem${i}" class="form-control form-control-sm espacio-vehiculo" min="0.1" step="0.1" value="${item.espacio.toFixed(1)}" required />
+        </div>
+        <div class="col-3">
+          <label for="matriculaItem${i}" class="form-label">Matrícula:</label>
+          <input type="text" id="matriculaItem${i}" class="form-control form-control-sm matricula-item" value="${item.matricula || ''}" placeholder="Ej: 1234ABC" />
+        </div>
+      `;
+      modalBodyPrecios.appendChild(div);
+
+      // Add listener for vehicle type change to update space
+      const tipoItemSelect = document.getElementById(`tipoItem${i}`);
+      const espacioItemInput = document.getElementById(`espacioItem${i}`);
+
+      if (tipoItemSelect) {
+          // Set the selected value in the dropdown
+          tipoItemSelect.value = item.type;
+
+          tipoItemSelect.addEventListener('change', (e) => {
+              const selectedOption = e.target.options[e.target.selectedIndex];
+              const newSpace = parseFloat(selectedOption.dataset.slots);
+              if (!isNaN(newSpace) && newSpace > 0) {
+                  espacioItemInput.value = newSpace.toFixed(1);
+              }
+          });
+      }
+    });
+    modalPrecios.show();
+  }
+
+  // Event listener for submitting the individual prices form
+  formPrecios.addEventListener('submit', e => {
+    e.preventDefault();
+    const numItems = parseInt(vehiculosInput.value, 10);
+    let itemsDetails = [];
+    let valido = true;
+    let sumaPrecios = 0;
+    let sumaEspacios = 0; // Will be used to update the main input
+
+    for (let i = 0; i < numItems; i++) {
+      const tipoInput = document.getElementById(`tipoItem${i}`);
+      const precioInput = document.getElementById(`precioItem${i}`);
+      const espacioInput = document.getElementById(`espacioItem${i}`);
+      const matriculaInput = document.getElementById(`matriculaItem${i}`); // Get matricula input
+      
+      const tipoVal = tipoInput ? tipoInput.value : (defaultVehicleType ? defaultVehicleType.name : "Default");
+      const precioVal = parseFloat(precioInput.value);
+      const espacioVal = parseFloat(espacioInput.value);
+      const matriculaVal = matriculaInput ? matriculaInput.value.trim() : ''; // Get matricula value
+
+      if (isNaN(precioVal) || precioVal < 0 || isNaN(espacioVal) || espacioVal <= 0) {
+        valido = false;
+        break;
+      }
+      itemsDetails.push({ type: tipoVal, precio: precioVal, espacio: espacioVal, matricula: matriculaVal }); // Save matricula
+      sumaPrecios += precioVal;
+      sumaEspacios += espacioVal; // Sum the spaces
+    }
+
+    if (!valido) {
+      showFeedbackModal('Introduce precios y espacios válidos (precio >= 0, espacio > 0).', 'danger');
+      return;
+    }
+
+    sessionStorage.setItem('itemsDetails', JSON.stringify(itemsDetails));
+    precioTransporteInput.value = sumaPrecios.toFixed(2);
+    espacioPorVehiculoInput.value = sumaEspacios.toFixed(1); // Update the main input with the sum of slots
+    modalPrecios.hide();
+    actualizarDistancia(); // Recalculate distance and enable button if everything is valid
+  });
+
+  // Double click on total price opens modal for individual prices
+  precioTransporteInput.addEventListener('dblclick', abrirModalPrecios);
+
+  // Update prices button reuses the same function to open the modal
+  document.getElementById('btn-actualizar-precios').addEventListener('click', abrirModalPrecios);
+
+  // Update related values when changing number of items/packages
+  vehiculosInput.addEventListener('change', () => {
+    let val = parseInt(vehiculosInput.value, 10);
+    if (isNaN(val) || val < 1) { // Ensure the value is valid before continuing
+        vehiculosInput.value = 1;
+        val = 1; // Use the corrected value for calculations
+        showFeedbackModal('El número de ítems/paquetes debe ser al menos 1.', 'warning');
+    } else if (val > 50) { // Limit to 50 items per transport to avoid UI overload
+      vehiculosInput.value = 50;
+      val = 50; // Use the corrected value for calculations
+      showFeedbackModal('Máximo 50 ítems/paquetes permitidos por transporte.', 'warning');
+    }
+    
+    // Reset individual item details when changing the quantity of items
+    sessionStorage.removeItem('itemsDetails');
+    
+    // Update total price with a default value based on the new quantity of items
+    precioTransporteInput.value = (300 / val).toFixed(2);
+    
+    // Update total item space with the sum of default values
+    if (defaultVehicleType) {
+        espacioPorVehiculoInput.value = (val * defaultVehicleType.slot_occupation).toFixed(1);
+    } else {
+        // Fallback if defaultVehicleType is not loaded (should be rare with window.load await)
+        espacioPorVehiculoInput.value = (val * 1.0).toFixed(1);
+        console.warn('defaultVehicleType no está disponible, usando 1.0 carga por defecto.');
+    }
+    actualizarDistancia();
+  });
+
+
+  // The "espacioPorVehiculoInput" input is now readonly, so its `change` listener
+  // is no longer relevant for user interaction. Its value is updated programmatically.
+  // espacioPorVehiculoInput.addEventListener('change', () => { /* ... */ });
+
+
+  // Event listener for submitting the main form
+  document.getElementById('form').addEventListener('submit', e => {
+    e.preventDefault();
+    const distancia = parseFloat(document.getElementById('distanciaKm').value);
+    const numItems = parseInt(vehiculosInput.value, 10); // Now it's numItems
+    const coste100km = parseFloat(document.getElementById('coste100km').value);
+    const precioTotal = parseFloat(precioTransporteInput.value);
+    const truckSlots = parseInt(truckSlotsInput.value, 10);
+    const totalEspacioOcupadoForm = parseFloat(espacioPorVehiculoInput.value); // Get the value from the modified field
+
+    if (
+      !coords.origen || !coords.destino ||
+      isNaN(distancia) || distancia <= 0 ||
+      isNaN(numItems) || numItems < 1 ||
+      isNaN(coste100km) || coste100km < 0 ||
+      isNaN(precioTotal) || precioTotal < 0 ||
+      isNaN(truckSlots) || truckSlots < 1 ||
+      isNaN(totalEspacioOcupadoForm) || totalEspacioOcupadoForm <= 0 // Validate the new field
+    ) {
+      actualizarResultado('Introduce todos los datos correctamente.', 'danger');
+      return;
+    }
+
+    // Get item details or create default ones
+    let itemsDetails = [];
+    try {
+        itemsDetails = JSON.parse(sessionStorage.getItem('itemsDetails')) || [];
+    } catch {
+        itemsDetails = [];
+    }
+    // If no item details are saved or the quantity does not match, generate default ones
+    if (itemsDetails.length !== numItems || itemsDetails.some(item => !item.type || !item.espacio || typeof item.matricula === 'undefined')) { // Added matricula check
+        const defaultPrecioPerItem = precioTotal / numItems;
+        const defaultEspacioPerItem = defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0;
+        const defaultTypeName = defaultVehicleType ? defaultVehicleType.name : "Default";
+
+        itemsDetails = Array.from({ length: numItems }, () => ({
+            type: defaultTypeName,
+            precio: defaultPrecioPerItem,
+            espacio: defaultEspacioPerItem,
+            matricula: '' // Ensure matricula is initialized
+        }));
+    }
+
+    // If the user has manually edited the "Total item space (carga)",
+    // we might want to recalculate individual spaces proportionally or ignore the detail.
+    // To simplify, if the edited total does not match the sum of current itemsDetails,
+    // we recalculate individual spaces so that the sum matches the edited total.
+    const currentSumOfItemsDetailsSpace = itemsDetails.reduce((sum, item) => sum + item.espacio, 0);
+    if (totalEspacioOcupadoForm.toFixed(1) !== currentSumOfItemsDetailsSpace.toFixed(1) && numItems > 0) {
+        // Redistribute totalEspacioOcupadoForm among existing items, maintaining proportion if possible.
+        // Or simpler, assign the average to each item.
+        const newSpacePerItem = totalEspacioOcupadoForm / numItems;
+        itemsDetails = itemsDetails.map(item => ({
+            ...item,
+            espacio: newSpacePerItem
+        }));
+        showFeedbackModal('El espacio total de ítems ha sido ajustado manualmente. Los espacios individuales de los ítems se han actualizado para que su suma coincida con el total. Puedes editar individualmente en el modal si necesitas más precisión.', 'info');
+    }
+
+
+    const costeTotal = (coste100km * distancia) / 100;
+    const beneficio = precioTotal - costeTotal;
+    const beneficioPorItem = beneficio / numItems; // Benefit per individual item
+
+    ultimoCalculo = {
+      origen: coords.origen?.label || '',
+      destino: coords.destino?.label || '',
+      distancia,
+      numItems, // Number of items/packages
+      totalEspacioOcupado: totalEspacioOcupadoForm, // Use the value from the main field
+      coste100km,
+      precioTotal,
+      beneficio,
+      beneficioPorItem, // Benefit per item
+      truckSlots, // Truck slots
+      itemsDetails // Details of each item (possibly adjusted)
+    };
+
+    actualizarResultado(
+      `<strong>Resultados:</strong><br/>
+      Origen: ${ultimoCalculo.origen}<br/>
+      Destino: ${ultimoCalculo.destino}<br/>
+      Distancia: ${distancia.toFixed(2)} km<br/>
+      Ítems/Paquetes: ${numItems}<br/>
+      Espacio total ocupado: ${totalEspacioOcupadoForm.toFixed(1)} carga<br/>
+      Coste camión: €${costeTotal.toFixed(2)}<br/>
+      Precio total: €${precioTotal.toFixed(2)}<br/>
+      <strong>Beneficio total: €${beneficio.toFixed(2)}</strong><br/>
+      Beneficio por ítem: €${beneficioPorItem.toFixed(2)}`
+    );
+  });
+
+  /**
+   * Clears the form fields and results.
+   */
+  function limpiarFormulario() {
+    document.getElementById('origen').value = '';
+    document.getElementById('destino').value = '';
+    document.getElementById('distanciaKm').value = '';
+    document.getElementById('resultado').innerHTML = '';
+    coords.origen = null;
+    coords.destino = null;
+    ultimoCalculo = null;
+    sessionStorage.removeItem('itemsDetails'); // Clear item details
+    precioTransporteInput.value = '300';
+    vehiculosInput.value = '1';
+    // Ensure the item space is reset to the default value
+    if (defaultVehicleType) {
+        // For 1 item, the total space is the space of that item (by default)
+        espacioPorVehiculoInput.value = defaultVehicleType.slot_occupation.toFixed(1);
+    } else {
+        espacioPorVehiculoInput.value = '1.0';
+    }
+    truckSlotsInput.value = '8'; // Reset truck slots
+  }
+
+  /**
+   * Generates the payload for the OpenRouteService Optimization API.
+   * Modificado para usar 'shipments' en lugar de 'jobs' individuales de pickup/delivery.
+   * Esto asegura que la recogida de un artículo está vinculada a su entrega.
+   * @param {Array<Object>} transportsList - La lista de transportes.
+   * @param {number} truckCapacity - La capacidad total del camión.
+   * @returns {Object|null} El payload de optimización o null si no hay transportes.
+   */
+  function generateOptimizationPayload(transportsList, truckCapacity) {
+      if (transportsList.length === 0) {
+          return null;
+      }
+
+      const shipments = []; // Usamos 'shipments' en lugar de 'jobs'
+      const vehicles = [];
+      const serviceTime = 300; // 5 minutes service time por recogida/entrega
+
+      // Generar 'shipments' a partir de los transportes
+      transportsList.forEach((t, index) => {
+          // Cada transporte es un 'shipment' completo (recogida + entrega)
+          shipments.push({
+              id: index + 1, // ID único para el shipment
+              // ES CRÍTICO: NO incluyas 'id' en pickup ni en delivery, solo el shipment tiene su ID
+              pickup: {
+                  location: [t.origenCoords.lon, t.origenCoords.lat],
+                  amount: [t.totalEspacioOcupado], // Cantidad de carga del transporte
+                  service: serviceTime,
+                  skills: [1] // Habilidad genérica
+              },
+              delivery: {
+                  location: [t.destinoCoords.lon, t.destinoCoords.lat],
+                  amount: [t.totalEspacioOcupado], // Misma cantidad de carga para la entrega
+                  service: serviceTime,
+                  skills: [1] // Habilidad genérica
+              }
+          });
+      });
+
+      // Definir un único vehículo
+      // Asume que el vehículo comienza y termina en el origen del primer transporte de la lista.
+      const firstOrigin = transportsList[0].origenCoords;
+
+      vehicles.push({
+          id: 1, // ID único del vehículo
+          profile: 'driving-car',
+          start: [firstOrigin.lon, firstOrigin.lat],
+          end: [firstOrigin.lon, firstOrigin.lat], // Vuelve al punto de inicio
+          capacity: [truckCapacity], // Capacidad máxima del camión
+          skills: [1] // El vehículo tiene la habilidad genérica. Debe coincidir con las habilidades de los shipments.
+          // time_window: [28800, 43200] // Opcional: 8:00 AM a 12:00 PM (segundos desde la medianoche)
+      });
+
+      return { shipments, vehicles };
+  }
+
+  /**
+   * Calls the OpenRouteService Optimization API via the proxy.
+   * @param {Object} payload - The optimization payload (shipments, vehicles).
+   * @returns {Promise<Object>} The optimization result.
+   */
+  async function callOptimizationAPI(payload) {
+      const body = {
+          action: 'optimization', // 'optimization'
+          ...payload
+      };
+      console.log('Sending optimization request to proxy with body:', JSON.stringify(body));
+
+      const resp = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+          throw new Error(data.error || 'No se pudo optimizar la ruta.');
+      }
+      return data;
+  }
+
+  // Event listener for adding transport to the list button
+  document.getElementById('btn-anadir').addEventListener('click', () => {
+    // Clear any previous optimization result when a new transport is added.
+    currentOptimizedRouteData = null;
+
+    const distancia = parseFloat(document.getElementById('distanciaKm').value);
+    const numItems = parseInt(vehiculosInput.value, 10); // Now it's numItems
+    const coste100km = parseFloat(document.getElementById('coste100km').value);
+    const precioTotal = parseFloat(precioTransporteInput.value);
+    const truckSlots = parseInt(truckSlotsInput.value, 10);
+    const totalEspacioOcupadoForm = parseFloat(espacioPorVehiculoInput.value); // Get the value from the modified field
+
+    if (
+      !coords.origen || !coords.destino ||
+      isNaN(distancia) || distancia <= 0 ||
+      isNaN(numItems) || numItems < 1 ||
+      isNaN(coste100km) || coste100km < 0 ||
+      isNaN(precioTotal) || precioTotal < 0 ||
+      isNaN(truckSlots) || truckSlots < 1 ||
+      isNaN(totalEspacioOcupadoForm) || totalEspacioOcupadoForm <= 0
+    ) {
+      showFeedbackModal('Por favor, asegúrate de que todos los campos (origen, destino, distancia, ítems/paquetes, espacio total de ítems, capacidad camión, coste y precio) estén completos y sean válidos antes de añadir el transporte.', 'warning');
+      return;
+    }
+
+    // Get item details or create default ones
+    let itemsDetails = [];
+    try {
+        itemsDetails = JSON.parse(sessionStorage.getItem('itemsDetails')) || [];
+    } catch {
+        itemsDetails = [];
+    }
+    // If no item details are saved or the quantity does not match, generate default ones
+    if (itemsDetails.length !== numItems || itemsDetails.some(item => !item.type || !item.espacio || typeof item.matricula === 'undefined')) { // Added matricula check
+        const defaultPrecioPerItem = precioTotal / numItems;
+        const defaultEspacioPerItem = defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0;
+        const defaultTypeName = defaultVehicleType ? defaultVehicleType.name : "Default";
+        
+        itemsDetails = Array.from({ length: numItems }, () => ({
+            type: defaultTypeName,
+            precio: defaultPrecioPerItem,
+            espacio: defaultEspacioPerItem,
+            matricula: '' // Ensure matricula is initialized
+        }));
+    }
+
+    // Ensure that the sum of itemsDetails.espacio matches totalEspacioOcupadoForm
+    const currentSumOfItemsDetailsSpace = itemsDetails.reduce((sum, item) => sum + item.espacio, 0);
+    if (totalEspacioOcupadoForm.toFixed(1) !== currentSumOfItemsDetailsSpace.toFixed(1) && numItems > 0) {
+        const newSpacePerItem = totalEspacioOcupadoForm / numItems;
+        itemsDetails = itemsDetails.map(item => ({
+            ...item,
+            espacio: newSpacePerItem
+        }));
+        showFeedbackModal('El espacio total de ítems ha sido ajustado manualmente al añadir. Los espacios individuales se han actualizado para que su suma coincida con el total.', 'info');
+    }
+
+    const costeTotal = (coste100km * distancia) / 100;
+    const beneficio = precioTotal - costeTotal;
+    const beneficioPorItem = beneficio / numItems; // Benefit per item
+
+    const transporteNuevo = {
+      origen: coords.origen.label, // Full address
+      destino: coords.destino.label, // Full address
+      origenLocality: coords.origen.locality, // Simplified locality
+      destinoLocality: coords.destino.locality, // Simplified locality
+      distancia,
+      numItems, // Number of items/packages
+      totalEspacioOcupado: totalEspacioOcupadoForm, // Use the value from the main field
+      coste100km,
+      precioTotal,
+      beneficio,
+      beneficioPorItem, // Benefit per item
+      truckSlots, // Truck slots
+      itemsDetails, // Details of each item (possibly adjusted)
+      origenCoords: { lat: coords.origen.lat, lon: coords.origen.lon },
+      destinoCoords: { lat: coords.destino.lat, lon: coords.destino.lon }
+    };
+
+    transportes.push(transporteNuevo);
+    mostrarListaTransportes(); // This function now updates the map
+    actualizarResultado('Transporte añadido a la lista.', 'success');
+    document.getElementById('btn-descargar').disabled = false;
+    limpiarFormulario();
+    desactivarBotonAnadir();
+  });
+
+  /**
+   * Helper function to find the index of the closest point in a polyline.
+   * This function expects `targetLatLng` and `polyline` in [lat, lon] format.
+   * @param {Array<number>} targetLatLng - The target point as [lat, lon].
+   * @param {Array<Array<number>>} polyline - The polyline points as an array of [lat, lon].
+   * @returns {number} The index of the closest point in the polyline.
+   */
+  function findClosestPointIndex(targetLatLng, polyline) {
+      if (!polyline || polyline.length === 0) return -1;
+      let minDistance = Infinity;
+      let closestIndex = -1;
+      for (let i = 0; i < polyline.length; i++) {
+          const point = polyline[i]; // point is [lat, lon]
+          const distance = Math.sqrt(
+              Math.pow(targetLatLng[0] - point[0], 2) + // lat difference
+              Math.pow(targetLatLng[1] - point[1], 2)   // lon difference
+          );
+          if (distance < minDistance) {
+              minDistance = distance;
+              closestIndex = i;
+          }
+      }
+      return closestIndex;
+  }
+
+  /**
+   * Calculates and returns the total profitability data for the entire route.
+   * This function does NOT draw anything on the map directly.
+   * @returns {Promise<{totalDistance: number, totalRouteCost: number, totalAllItemsPricesSum: number, maxConcurrentLoadSlots: number, totalItemsHandled: number, currentTruckSlotsCapacity: number, totalRouteBenefit: number, averageItemBenefit: number, actualRoutePath: Array<Array<number>>, vehicleLoadEvents: Array<Object>}>}
+   */
+  async function calcularRentabilidadTotalRutaData() {
+      let totalDistance = 0;
+      let totalAllItemsPricesSum = 0;
+      let sumOfCoste100kmPerJob = 0;
+      let actualRoutePath = []; // Detailed route coordinates from ORS [lon, lat]
+      let vehicleLoadEvents = []; // Stores {type: 'pickup'/'delivery', item: itemObject, coord: {lat, lon}, transportIndex, itemIndex}
+
+      const currentTruckSlotsCapacity = parseInt(truckSlotsInput.value, 10) || 8;
+
+      if (transportes.length === 0) {
+          return {
+              totalDistance: 0,
+              totalRouteCost: 0,
+              totalAllItemsPricesSum: 0,
+              maxConcurrentLoadSlots: 0,
+              totalItemsHandled: 0,
+              currentTruckSlotsCapacity: currentTruckSlotsCapacity,
+              totalRouteBenefit: 0,
+              averageItemBenefit: 0,
+              actualRoutePath: [],
+              vehicleLoadEvents: []
+          };
+      }
+
+      let allRouteWaypointsForORS = [];
+      if (transportes.length > 0) {
+          allRouteWaypointsForORS.push([transportes[0].origenCoords.lon, transportes[0].origenCoords.lat]);
+
+          for (let i = 0; i < transportes.length; i++) {
+              const t = transportes[i];
+              totalAllItemsPricesSum += t.precioTotal;
+              sumOfCoste100kmPerJob += t.coste100km;
+
+              t.itemsDetails.forEach((item, itemIndex) => {
+                  vehicleLoadEvents.push({ type: 'pickup', item: item, coord: t.origenCoords, transportIndex: i, itemIndex: itemIndex });
+                  vehicleLoadEvents.push({ type: 'delivery', item: item, coord: t.destinoCoords, transportIndex: i, itemIndex: itemIndex });
+              });
+
+              const lastCoordAdded = allRouteWaypointsForORS[allRouteWaypointsForORS.length - 1];
+              if (lastCoordAdded[0] !== t.destinoCoords.lon || lastCoordAdded[1] !== t.destinoCoords.lat) {
+                  allRouteWaypointsForORS.push([t.destinoCoords.lon, t.destinoCoords.lat]);
+              }
+
+              if (i < transportes.length - 1) {
+                  const nextTransport = transportes[i + 1];
+                  if (nextTransport.origenCoords.lon !== t.destinoCoords.lon ||
+                      nextTransport.origenCoords.lat !== t.destinoCoords.lat) {
+                      const nextOriginCoord = [nextTransport.origenCoords.lon, nextTransport.origenCoords.lat];
+                      const currentLastCoord = allRouteWaypointsForORS[allRouteWaypointsForORS.length - 1];
+                      if (currentLastCoord[0] !== nextOriginCoord[0] || currentLastCoord[1] !== nextOriginCoord[1]) {
+                          allRouteWaypointsForORS.push(nextOriginCoord);
+                      }
+                  }
+              }
+          }
+      }
+
+      try {
+          if (allRouteWaypointsForORS.length >= 2) {
+              const routeResult = await getOverallRouteDistance(allRouteWaypointsForORS);
+              totalDistance = routeResult.distance;
+              actualRoutePath = routeResult.path; // This is already an array of [lon, lat]
+          }
+      } catch (e) {
+          console.error("Error calculating overall route distance with segments:", e);
+          showFeedbackModal(`Error al calcular la distancia total de la ruta: ${e.message}`, 'danger');
+          return {
+              totalDistance: 0,
+              totalRouteCost: 0,
+              totalAllItemsPricesSum: 0,
+              maxConcurrentLoadSlots: 0,
+              totalItemsHandled: 0,
+              currentTruckSlotsCapacity: currentTruckSlotsCapacity,
+              totalRouteBenefit: 0,
+              averageItemBenefit: 0,
+              actualRoutePath: [],
+              vehicleLoadEvents: []
+          };
+      }
+
+      // Calculate maxConcurrentLoadSlots
+      let currentLoadSlots = 0;
+      let maxConcurrentLoadSlots = 0;
+      let totalItemsHandled = 0; // Sum of numItems for total items
+      let totalBeneficioIndividual = 0;
+
+      // Convert actualRoutePath from [lon, lat] to [lat, lon] for findClosestPointIndex
+      const latLngPathForProcessing = actualRoutePath.map(coord => [coord[1], coord[0]]);
+
+      const sortedEventsWithIndices = vehicleLoadEvents.map(event => ({
+          ...event,
+          pathIndex: findClosestPointIndex([event.coord.lat, event.coord.lon], latLngPathForProcessing)
+      }));
+
+      // Sort events: first by pathIndex, then pickups before deliveries (ensures accurate load calculation at a single point)
+      sortedEventsWithIndices.sort((a, b) => {
+          if (a.pathIndex !== b.pathIndex) {
+              return a.pathIndex - b.pathIndex;
+          }
+          return (a.type === 'pickup' ? -1 : 1) - (b.type === 'pickup' ? -1 : 1);
+      });
+
+      const handledItems = new Set(); // To ensure each unique item is counted for totalBeneficioIndividual once.
+      sortedEventsWithIndices.forEach(event => {
+          const itemKey = `${event.transportIndex}-${event.itemIndex}`;
+          if (event.type === 'pickup') {
+              currentLoadSlots += event.item.espacio;
+              if (!handledItems.has(itemKey)) {
+                  totalItemsHandled += 1;
+                  // Calculate the benefit for this specific item based on its transport's overall cost and quantity
+                  const transport = transportes[event.transportIndex];
+                  const costPerItem = (transport.coste100km * transport.distancia) / 100 / transport.numItems;
+                  totalBeneficioIndividual += event.item.precio - costPerItem;
+                  handledItems.add(itemKey);
+              }
+          } else if (event.type === 'delivery') {
+              currentLoadSlots -= event.item.espacio;
+          }
+          if (currentLoadSlots > maxConcurrentLoadSlots) {
+              maxConcurrentLoadSlots = currentLoadSlots;
+          }
+      });
+
+      const averageCoste100km = transportes.length > 0 ? sumOfCoste100kmPerJob / transportes.length : 0;
+      const totalRouteCost = (averageCoste100km * totalDistance) / 100;
+      const totalRouteBenefit = totalAllItemsPricesSum - totalRouteCost;
+      const averageItemBenefit = totalItemsHandled > 0 ? (totalBeneficioIndividual / totalItemsHandled) : 0;
+
+
+      return {
+          totalDistance,
+          totalRouteCost,
+          totalAllItemsPricesSum,
+          maxConcurrentLoadSlots,
+          totalItemsHandled,
+          currentTruckSlotsCapacity,
+          totalRouteBenefit,
+          averageItemBenefit,
+          actualRoutePath, // still [lon, lat]
+          vehicleLoadEvents: sortedEventsWithIndices // These events are now sorted and have pathIndex
+      };
+  }
+
+  /**
+   * Draws the complete route on the map, including the main polyline,
+   * origin/destination markers, and load indicators at event points.
+   * @param {Array<Array<number>>} actualRoutePathLonLat - The detailed route path as an array of [lon, lat] coordinates (from ORS).
+   * @param {Array<Object>} sortedEventsWithIndices - Processed load events with their path indices (for non-optimized view).
+   * @param {Array<Object>} transportsList - The original list of transport objects (to get full labels for O/D markers).
+   * @param {number} currentTruckCapacity - The current total capacity of the truck.
+   * @param {Array<Object>} [optimizedActivities=null] - Optional: array of activities from ORS optimization result, if available.
+   */
+  function dibujarRutaEnMapaConCarga(actualRoutePathLonLat, sortedEventsWithIndices, transportsList, currentTruckCapacity, optimizedActivities = null) {
+      // Clear all existing map layers before redrawing
+      routeLayers.clearLayers();
+
+      const latLngPathForDrawing = actualRoutePathLonLat.map(coord => [coord[1], coord[0]]);
+
+      if (latLngPathForDrawing.length === 0) {
+          map.setView([40.416775, -3.703790], 6); // Reset view if no route
+          return;
+      }
+
+      // Draw the main route polyline
+      L.polyline(latLngPathForDrawing, { color: 'blue', weight: 4, opacity: 0.7 }).addTo(routeLayers);
+
+      // If optimizedActivities are provided, use them for markers/popups.
+      if (optimizedActivities && optimizedActivities.length > 0) {
+          // Create a map to link shipment_id to original transport data
+          const shipmentToTransportMap = new Map();
+          transportsList.forEach((t, idx) => {
+              // The id for shipment is index + 1
+              shipmentToTransportMap.set(idx + 1, t);
+          });
+
+          optimizedActivities.forEach(activity => {
+              const lat = activity.location[1];
+              const lon = activity.location[0];
+              let label = '';
+              let iconHtml = '';
+              let iconClassName = 'load-icon'; // Default for load icons
+
+              if (activity.type === 'start' || activity.type === 'end') {
+                  label = `Depósito / ${activity.type === 'start' ? 'Inicio' : 'Fin'} de Ruta`;
+                  iconHtml = `<i class="fas fa-warehouse"></i>`;
+                  iconClassName = 'bg-primary text-white p-1 rounded-circle d-flex align-items-center justify-content-center'; // Styling for depot
+              } else {
+                  // For shipments, activity.id refers to the shipment_id, not job_id
+                  const originalTransport = shipmentToTransportMap.get(activity.id);
+                  if (originalTransport) {
+                      const loadAfter = activity.load_after && activity.load_after.length > 0 ? activity.load_after[0] : 0;
+                      if (activity.type === 'pickup') {
+                          label = `<strong>Recogida en:</strong> ${originalTransport.origen}<br/>
+                                   Ítems: ${originalTransport.numItems}<br/>
+                                   Carga: ${originalTransport.totalEspacioOcupado.toFixed(1)}<br/>
+                                   Carga en camión después: ${loadAfter.toFixed(1)}`;
+                          iconHtml = `<span>${loadAfter.toFixed(1)}</span>`; // Show load
+                      } else if (activity.type === 'delivery') {
+                          label = `<strong>Entrega en:</strong> ${originalTransport.destino}<br/>
+                                   Ítems: ${originalTransport.numItems}<br/>
+                                   Carga: ${originalTransport.totalEspacioOcupado.toFixed(1)}<br/>
+                                   Carga en camión después: ${loadAfter.toFixed(1)}`;
+                          iconHtml = `<span>${loadAfter.toFixed(1)}</span>`; // Show load
+                      }
+                      
+                      // Determine icon color based on final load at this point
+                      if (loadAfter > currentTruckCapacity) {
+                          iconClassName += ' high-load'; // Over capacity
+                      } else if (loadAfter > (currentTruckCapacity * 0.75)) { // 75% or more occupied
+                          iconClassName += ' medium-load';
+                      }
+                  }
+              }
+
+              const icon = L.divIcon({
+                  className: iconClassName,
+                  html: iconHtml,
+                  iconSize: [30, 30]
+              });
+
+              L.marker([lat, lon], { icon: icon })
+               .bindPopup(label)
+               .addTo(routeLayers);
+          });
+      } else {
+          // Existing logic for drawing unique origin/destination markers
+          const uniqueLocations = new Map();
+          transportsList.forEach(t => {
+              uniqueLocations.set(`${t.origenCoords.lat},${t.origenCoords.lon}`, { lat: t.origenCoords.lat, lon: t.origenCoords.lon, label: t.origen });
+              uniqueLocations.set(`${t.destinoCoords.lat},${t.destinoCoords.lon}`, { lat: t.destinoCoords.lat, lon: t.destinoCoords.lon, label: t.destino });
+          });
+          uniqueLocations.forEach(loc => {
+              L.marker([loc.lat, loc.lon]).addTo(routeLayers).bindPopup(loc.label);
+          });
+
+          // Draw load indicators for the current (non-optimized) view
+          if (sortedEventsWithIndices && sortedEventsWithIndices.length > 0) {
+              const aggregatedPoints = new Map();
+              let currentLoadDuringAggregation = 0;
+              for (const event of sortedEventsWithIndices) {
+                  const lat = event.coord.lat.toFixed(5);
+                  const lon = event.coord.lon.toFixed(5);
+                  const geoPointKey = `${lat},${lon}`;
+                  const latLng = L.latLng(event.coord.lat, event.coord.lon);
+
+                  if (!aggregatedPoints.has(geoPointKey)) {
+                      aggregatedPoints.set(geoPointKey, {
+                          latLng: latLng,
+                          pickups: [],
+                          deliveries: [],
+                          initialLoad: currentLoadDuringAggregation,
+                          finalLoad: 0
+                      });
+                  }
+                  const pointData = aggregatedPoints.get(geoPointKey);
+                  if (event.type === 'pickup') {
+                      pointData.pickups.push(event);
+                      currentLoadDuringAggregation += event.item.espacio;
+                  } else if (event.type === 'delivery') {
+                      pointData.deliveries.push(event);
+                      currentLoadDuringAggregation -= event.item.espacio;
+                  }
+                  pointData.finalLoad = currentLoadDuringAggregation;
+              }
+
+              aggregatedPoints.forEach(pointData => {
+                  const { latLng, pickups, deliveries, finalLoad } = pointData;
+                  let popupContent = `<strong>Carga actual: ${finalLoad.toFixed(1)} carga</strong>`;
+                  
+                  if (pickups.length > 0) {
+                      popupContent += `<br/><i class="fas fa-arrow-circle-up" style="color: green;"></i> <strong>Recogidas:</strong>`;
+                      const groupedPickups = pickups.reduce((acc, p) => {
+                          const key = (p.item.matricula || 'Sin Matrícula') + '_' + p.item.type;
+                          if (!acc[key]) { acc[key] = { matricula: p.item.matricula, type: p.item.type, totalEspacio: 0 }; }
+                          acc[key].totalEspacio += p.item.espacio; return acc;
+                      }, {});
+                      for (const key in groupedPickups) {
+                          const g = groupedPickups[key];
+                          const matriculaText = g.matricula ? ` (${g.matricula})` : '';
+                          popupContent += `<br/>&nbsp;&nbsp;&nbsp;+ ${g.totalEspacio.toFixed(1)} carga (${g.type}${matriculaText})`;
+                      }
+                  }
+                  if (deliveries.length > 0) {
+                      popupContent += `<br/><i class="fas fa-arrow-circle-down" style="color: red;"></i> <strong>Entregas:</strong>`;
+                      const groupedDeliveries = deliveries.reduce((acc, d) => {
+                          const key = (d.item.matricula || 'Sin Matrícula') + '_' + d.item.type;
+                          if (!acc[key]) { acc[key] = { matricula: d.item.matricula, type: d.item.type, totalEspacio: 0 }; }
+                          acc[key].totalEspacio += d.item.espacio; return acc;
+                      }, {});
+                      for (const key in groupedDeliveries) {
+                          const g = groupedDeliveries[key];
+                          const matriculaText = g.matricula ? ` (${g.matricula})` : '';
+                          popupContent += `<br/>&nbsp;&nbsp;&nbsp;+ ${g.totalEspacio.toFixed(1)} carga (${g.type}${matriculaText})`;
+                      }
+                  }
+
+                  let iconClassName = 'load-icon';
+                  if (finalLoad > currentTruckCapacity) { iconClassName += ' high-load'; }
+                  else if (finalLoad > (currentTruckCapacity * 0.75)) { iconClassName += ' medium-load'; }
+
+                  const icon = L.divIcon({ className: iconClassName, html: `<span>${finalLoad.toFixed(1)}</span>`, iconSize: [30, 30] });
+                  L.marker(latLng, { icon: icon }).bindPopup(popupContent).addTo(routeLayers);
+              });
+          }
+      }
+
+      // Adjust map to fit all drawn routes/markers
+      if (routeLayers.getBounds().isValid()) {
+          map.fitBounds(routeLayers.getBounds(), { padding: [50, 50] });
+      }
+  }
+
+
+  /**
+   * Updates the truck occupancy progress bar.
+   * @param {number} currentSlots - The current number of occupied carga.
+   * @param {number} totalSlots - The total capacity of the truck in carga.
+   */
+  function updateTruckOccupancyBar(currentSlots, totalSlots) {
+      console.log(`DEBUG_BAR: updateTruckOccupancyBar llamado con currentSlots: ${currentSlots}, totalSlots: ${totalSlots}`);
+      let percentage = (currentSlots / totalSlots) * 100;
+      if (isNaN(percentage) || totalSlots === 0 || totalSlots === null || totalSlots === undefined) percentage = 0;
+
+      truckOccupancyProgressBar.style.width = `${Math.min(percentage, 100)}%`;
+      truckOccupancyProgressBar.setAttribute('aria-valuenow', Math.min(percentage, 100));
+      truckOccupancyText.textContent = `${currentSlots.toFixed(1)} / ${totalSlots} carga (${percentage.toFixed(0)}%)`;
+
+      truckOccupancyProgressBar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+
+      if (percentage <= 70) {
+          truckOccupancyProgressBar.classList.add('bg-success');
+      } else if (percentage <= 100) {
+          truckOccupancyProgressBar.classList.add('bg-warning');
+      } else {
+          // Corrected the typo here: "truckOccup occupancyProgressBar" to "truckOccupancyProgressBar"
+          truckOccupancyProgressBar.classList.add('bg-danger');
+          truckOccupancyText.textContent = `${currentSlots.toFixed(1)} / ${totalSlots} carga (¡SOBRECARGADO!)`;
+      }
+      if (currentSlots === 0) {
+        truckOccupancyProgressBar.style.width = '0%';
+        truckOccupancyText.textContent = `0 / ${totalSlots} carga (0%)`;
+      }
+  }
+
+  /**
+   * Displays the list of added transports and handles all map visualizations.
+   * This is the central function for updating the UI after changes to 'transportes'.
+   */
+  async function mostrarListaTransportes() {
+    const ul = document.getElementById('lista-transportes');
+    ul.innerHTML = '';
+
+    if (sortableInstance) {
+      sortableInstance.destroy();
+      sortableInstance = null;
+    }
+
+    // Determine which data to use for profitability and map drawing
+    let routeDataForDisplay;
+    let actualRoutePath = [];
+    let vehicleLoadEventsForMap = [];
+    let activitiesForMap = null;
+    const currentTruckSlotsCapacity = parseInt(truckSlotsInput.value, 10) || 8;
+
+
+    if (currentOptimizedRouteData && currentOptimizedRouteData.summary && currentOptimizedRouteData.geometry) {
+        // Use optimized data for summary and map
+        routeDataForDisplay = {
+            totalDistance: currentOptimizedRouteData.summary.distance / 1000,
+            // Estimate cost based on optimized distance and average 100km cost from current transports
+            totalRouteCost: (currentOptimizedRouteData.summary.distance / 1000 / 100) * (transportes.length > 0 ? transportes.reduce((sum, t) => sum + t.coste100km, 0) / transportes.length : 0),
+            totalAllItemsPricesSum: transportes.reduce((sum, t) => sum + t.precioTotal, 0),
+            maxConcurrentLoadSlots: currentOptimizedRouteData.summary.amount && currentOptimizedRouteData.summary.amount.length > 0 ? currentOptimizedRouteData.summary.amount[0] : 0, // Assuming amount[0] is max load
+            totalItemsHandled: transportes.reduce((sum, t) => sum + t.numItems, 0),
+            currentTruckSlotsCapacity: currentTruckSlotsCapacity, // Use the input value
+            totalRouteBenefit: 0, // Will calculate below
+            averageItemBenefit: 0, // Will calculate below
+            actualRoutePath: currentOptimizedRouteData.geometry.coordinates,
+            vehicleLoadEvents: [], // Not directly used for optimized path load icons, use activities
+            optimizedActivities: currentOptimizedRouteData.activities // Pass activities for specialized marker drawing
+        };
+        // Recalculate benefit based on new total distance and actual route properties
+        routeDataForDisplay.totalRouteBenefit = routeDataForDisplay.totalAllItemsPricesSum - routeDataForDisplay.totalRouteCost;
+        routeDataForDisplay.averageItemBenefit = routeDataForDisplay.totalItemsHandled > 0 ? (routeDataForDisplay.totalRouteBenefit / routeDataForDisplay.totalItemsHandled) : 0;
+
+        actualRoutePath = routeDataForDisplay.actualRoutePath;
+        activitiesForMap = routeDataForDisplay.optimizedActivities;
+
+    } else {
+        // Use existing (non-optimized) calculation
+        const profitabilityData = await calcularRentabilidadTotalRutaData();
+        routeDataForDisplay = profitabilityData;
+        actualRoutePath = routeDataForDisplay.actualRoutePath;
+        vehicleLoadEventsForMap = profitabilityData.vehicleLoadEvents; // Ensure this is passed
+        activitiesForMap = null; // No optimized activities
+    }
+
+    const {
+        totalDistance,
+        totalRouteCost,
+        totalAllItemsPricesSum,
+        maxConcurrentLoadSlots,
+        totalItemsHandled,
+        totalRouteBenefit,
+        averageItemBenefit
+    } = routeDataForDisplay; // Destructure common properties
+
+    // Update main profitability display
+    const totalProfitabilitySection = document.getElementById('total-route-profitability');
+    const capacityWarningMessage = document.getElementById('capacity-warning-message');
+    const maxLoadWarningDisplay = document.getElementById('max-load-warning-display');
+
+    if (transportes.length === 0) {
+        ul.innerHTML = `
+            <div class="empty-list-message text-center text-muted p-3 border rounded">
+                <i class="fas fa-info-circle me-2"></i> No hay transportes en la lista. ¡Añade uno para empezar!
+            </div>
+        `;
+        document.getElementById('btn-descargar').disabled = true;
+        totalProfitabilitySection.style.display = 'none';
+        capacityWarningMessage.style.display = 'none';
+        updateTruckOccupancyBar(0, currentTruckSlotsCapacity);
+        // Clear map using the capacity as well
+        dibujarRutaEnMapaConCarga([], [], [], currentTruckSlotsCapacity, null);
+        return;
+    }
+
+    // Populate the list of transports
+    transportes.forEach((t, i) => {
+      const totalItemsThisTransport = t.itemsDetails.length;
+      const totalSpaceThisTransport = t.itemsDetails.reduce((sum, item) => sum + item.espacio, 0);
+
+      const summaryTooltip = `
+        Origen: ${t.origenLocality}
+        Destino: ${t.destinoLocality}
+        Distancia: ${t.distancia.toFixed(2)} km
+        Ítems: ${totalItemsThisTransport} (${totalSpaceThisTransport.toFixed(1)} carga)
+        Beneficio: €${t.beneficio.toFixed(2)}
+      `.replace(/\s\s+/g, ' ').trim();
+
+      const li = document.createElement('li');
+      li.className = 'list-group-item';
+      li.setAttribute('data-id', i);
+      li.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Transporte ${i+1}:</strong> ${t.origenLocality} <i class="fas fa-arrow-right"></i> ${t.destinoLocality}, ${t.distancia.toFixed(2)} km, ${totalItemsThisTransport} <i class="fas fa-cubes"></i>, ${totalSpaceThisTransport.toFixed(1)} carga
+          </div>
+          <div class="list-item-buttons">
+            <button type="button" class="btn btn-info btn-sm show-details-btn" data-index="${i}" data-bs-toggle="tooltip" data-bs-placement="top" title="${summaryTooltip}"><i class="fas fa-eye"></i> Detalles</button>
+            <button type="button" class="btn btn-danger btn-sm delete-btn" data-index="${i}" data-bs-toggle="tooltip" data-bs-placement="top" title="Elimina este transporte de la lista."><i class="fas fa-trash-alt"></i> Borrar</button>
+          </div>
+        </div>
+        <div class="profitability-details" id="details-${i}">
+          <p><strong>Detalles de Rentabilidad:</strong></p>
+          <p><strong>Origen:</strong> ${t.origen}</p>
+          <p><strong>Destino:</strong> ${t.destino}</p>
+          <p><strong>Distancia:</strong> ${t.distancia.toFixed(2)} km</p>
+          <p><strong>Número de ítems:</strong> ${totalItemsThisTransport}</p>
+          <p><strong>Espacio total ocupado:</strong> ${totalSpaceThisTransport.toFixed(1)} carga</p>
+          <p><strong>Capacidad del camión (de este transporte):</strong> ${t.truckSlots} carga</p>
+          <p><strong>Coste camión por 100 km:</strong> €${t.coste100km.toFixed(2)}</p>
+          <p><strong>Precio total transporte:</strong> €${t.precioTotal.toFixed(2)}</p>
+          <p><strong>Detalles de ítems:</strong></p>
+          <ul>
+            ${t.itemsDetails.map((item, idx) => `<li><i class="fas fa-car-side"></i> Ítem ${idx + 1}: Tipo: ${item.type}, Precio €${item.precio.toFixed(2)}, Espacio ${item.espacio.toFixed(1)} carga${item.matricula ? ` (Matrícula: ${item.matricula})` : ''}</li>`).join('')}
+          </ul>
+          <p><strong>Beneficio total:</strong> €${t.beneficio.toFixed(2)}</p>
+          <p><strong>Beneficio por ítem:</strong> €${t.beneficioPorItem.toFixed(2)}</p>
+        </div>
+      `;
+      ul.appendChild(li);
+    });
+
+    document.getElementById('btn-descargar').disabled = transportes.length === 0;
+
+    // Update main profitability display
+    document.getElementById('total-distance').textContent = totalDistance.toFixed(2);
+    document.getElementById('total-truck-cost').textContent = totalRouteCost.toFixed(2);
+    document.getElementById('total-transport-price').textContent = totalAllItemsPricesSum.toFixed(2);
+    document.getElementById('total-vehicles-transported').textContent = maxConcurrentLoadSlots.toFixed(1);
+    document.getElementById('total-items-count').textContent = totalItemsHandled;
+    document.getElementById('truck-slots-display').textContent = currentTruckSlotsCapacity;
+    const utilizationPercentage = currentTruckSlotsCapacity > 0 ? ((maxConcurrentLoadSlots / currentTruckSlotsCapacity) * 100).toFixed(2) : '0.00';
+    document.getElementById('utilization-percentage').textContent = utilizationPercentage;
+    document.getElementById('total-route-benefit').textContent = totalRouteBenefit.toFixed(2);
+    document.getElementById('average-vehicle-benefit').textContent = averageItemBenefit.toFixed(2);
+    totalProfitabilitySection.style.display = 'block';
+
+    // Show capacity warning if maximum simultaneous load exceeds carga
+    if (maxConcurrentLoadSlots > currentTruckSlotsCapacity) {
+        capacityWarningMessage.style.display = 'block';
+        maxLoadWarningDisplay.textContent = maxConcurrentLoadSlots.toFixed(1);
+    } else {
+        capacityWarningMessage.style.display = 'none';
+    }
+
+    updateTruckOccupancyBar(maxConcurrentLoadSlots, currentTruckSlotsCapacity);
+
+    // Initialize tooltips only for devices that support hover (non-touch devices)
+    if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    }
+
+
+    // Attach event listeners for delete and show details buttons
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const indexToDelete = parseInt(e.target.dataset.index, 10);
+        if (!isNaN(indexToDelete) && indexToDelete >= 0 && indexToDelete < transportes.length) {
+          transportes.splice(indexToDelete, 1);
+          currentOptimizedRouteData = null; // Reset optimization if list changes
+          await mostrarListaTransportes(); // Recalculate and redraw everything
+          actualizarResultado('Transporte eliminado de la lista.', 'info');
+        }
+      });
+    });
+
+    document.querySelectorAll('.show-details-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const indexToShow = parseInt(e.target.dataset.index, 10);
+        const detailsDiv = document.getElementById(`details-${indexToShow}`);
+        if (detailsDiv) {
+          detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+
+          const tooltipInstance = bootstrap.Tooltip.getInstance(e.target);
+          if (tooltipInstance) {
+            tooltipInstance.hide();
+          }
+        }
+      });
+    });
+
+    // Draw the map visualization after all data is ready
+    dibujarRutaEnMapaConCarga(actualRoutePath, vehicleLoadEventsForMap, transportes, currentTruckSlotsCapacity, activitiesForMap);
+
+    // Initialize SortableJS
+    sortableInstance = Sortable.create(ul, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      filter: '.show-details-btn, .delete-btn',
+      preventOnFilter: false,
+      onEnd: async function (evt) {
+        const [removed] = transportes.splice(evt.oldIndex, 1);
+        transportes.splice(evt.newIndex, 0, removed);
+        currentOptimizedRouteData = null; // Reset optimization if list changes
+        await mostrarListaTransportes(); // Recalculate and redraw everything on reorder
+        actualizarResultado('Orden de transportes actualizado.', 'info');
+      }
+    });
+  }
+
+  // Event listener for downloading JSON list
+  document.getElementById('btn-descargar').addEventListener('click', () => {
+    const dataStr = JSON.stringify(transportes, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transportes.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Event listener for loading JSON list
+  document.getElementById('btn-cargar').addEventListener('click', () => {
+    document.getElementById('input-cargar').click();
+  });
+
+  // Event listener for file input when loading a JSON file
+  document.getElementById('input-cargar').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async event => {
+      try {
+        const json = JSON.parse(event.target.result);
+        if (Array.isArray(json)) {
+          transportes = json.map(t => {
+            // Ensure coordinates exist for older formats
+            if (!t.origenCoords || !t.origenCoords.lat || !t.origenCoords.lon) {
+                console.warn(`Transporte sin coordenadas de origen válidas al cargar: ${t.origen}. Se intentará usar un marcador genérico.`);
+                // Fallback to a default if coordinates are truly missing, but map display might be off
+                t.origenCoords = { lat: 40.416775, lon: -3.703790 }; // Madrid default
+            }
+            if (!t.destinoCoords || !t.destinoCoords.lat || !t.destinoCoords.lon) {
+                console.warn(`Transporte sin coordenadas de destino válidas al cargar: ${t.destino}. Se intentará usar un marcador genérico.`);
+                t.destinoCoords = { lat: 40.416775, lon: -3.703790 }; // Madrid default
+            }
+
+            // If locality is not defined (older versions), try to extract it
+            if (!t.origenLocality && t.origen) {
+                t.origenLocality = t.origen.split(',')[0].trim();
+            }
+            if (!t.destinoLocality && t.destino) {
+                t.destinoLocality = t.destino.split(',')[0].trim();
+            }
+
+            if (!t.itemsDetails) {
+                if (t.preciosIndividuales) {
+                    t.itemsDetails = t.preciosIndividuales.map(precio => ({
+                        precio: precio,
+                        type: defaultVehicleType ? defaultVehicleType.name : "Turismo Ligero",
+                        espacio: defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0,
+                        matricula: '' // Ensure matricula is initialized
+                    }));
+                    delete t.preciosIndividuales;
+                } else if (t.vehiculos) {
+                     t.itemsDetails = Array.from({ length: t.vehiculos }, () => ({
+                        precio: (t.precioTotal / t.vehiculos) || 0,
+                        type: defaultVehicleType ? defaultVehicleType.name : "Turismo Ligero",
+                        espacio: defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0,
+                        matricula: '' // Ensure matricula is initialized
+                    }));
+                } else {
+                    t.itemsDetails = [{
+                        precio: t.precioTotal || 0,
+                        type: defaultVehicleType ? defaultVehicleType.name : "Turismo Ligero",
+                        espacio: defaultVehicleType ? defaultVehicleType.slot_occupation : 1.0,
+                        matricula: '' // Ensure matricula is initialized
+                    }];
+                }
+            } else {
+                // Ensure existing itemsDetails have matricula field
+                t.itemsDetails = t.itemsDetails.map(item => ({
+                    ...item,
+                    matricula: item.matricula || '' // Add if missing
+                }));
+            }
+
+            t.numItems = t.itemsDetails.length;
+            t.totalEspacioOcupado = t.itemsDetails.reduce((sum, item) => sum + item.espacio, 0);
+
+            if (typeof t.truckSlots === 'undefined') {
+                t.truckSlots = parseInt(truckSlotsInput.value, 10);
+            }
+
+            return t;
+          });
+          currentOptimizedRouteData = null; // Reset optimization when new data is loaded
+          await mostrarListaTransportes();
+          actualizarResultado('Lista cargada correctamente.', 'success');
+          document.getElementById('btn-descargar').disabled = transportes.length === 0;
+        } else {
+          actualizarResultado('Archivo JSON no tiene formato válido.', 'danger');
+        }
+      } catch (error) {
+        console.error('Error al cargar o parsear el archivo JSON:', error);
+        actualizarResultado('Error al leer o procesar el archivo JSON. Asegúrate de que el formato sea correcto.', 'danger');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // Event listener for changing truck slots, to recalculate total profitability
+  truckSlotsInput.addEventListener('change', async () => {
+      let val = parseInt(truckSlotsInput.value, 10);
+      if (isNaN(val) || val < 1) {
+          truckSlotsInput.value = 1;
+      } else if (val > 12) {
+          truckSlotsInput.value = 12;
+          showFeedbackModal('Se ha limitado el número de plazas a un máximo de 12.', 'warning');
+      }
+      currentOptimizedRouteData = null; // Reset optimization if truck capacity changes
+      await mostrarListaTransportes(); // Recalculate and redraw all on capacity change
+  });
+
+  // Initialize autocomplete functions
+  crearAutoCompletar('origen', 'origen-list');
+  crearAutoCompletar('destino', 'destino-list');
+
+  // Event listener for Optimizar Ruta button
+  document.getElementById('btn-optimizar').addEventListener('click', async () => {
+      if (transportes.length === 0) {
+          showFeedbackModal('No hay transportes en la lista para optimizar.', 'warning');
+          return;
+      }
+      try {
+          actualizarResultado('Optimizando ruta...', 'info');
+          const payload = generateOptimizationPayload(transportes, parseInt(truckSlotsInput.value, 10));
+          const optimizationResult = await callOptimizationAPI(payload);
+
+          if (optimizationResult.routes && optimizationResult.routes.length > 0) {
+              currentOptimizedRouteData = optimizationResult.routes[0]; // Store the primary optimized route
+              actualizarResultado('Ruta optimizada correctamente. El mapa muestra la ruta optimizada.', 'success');
+              // Re-render the list and map with optimized data
+              await mostrarListaTransportes();
+          } else {
+              currentOptimizedRouteData = null; // Clear previous optimization
+              showFeedbackModal('La optimización no pudo encontrar una ruta. Asegúrate de que todos los puntos sean accesibles y que la capacidad del camión sea suficiente o que no haya trabajos no asignados.', 'warning');
+              await mostrarListaTransportes(); // Re-render to clear any old optimized route
+          }
+      } catch (e) {
+          currentOptimizedRouteData = null; // Clear previous optimization
+          actualizarResultado(`Error al optimizar la ruta: ${e.message}`, 'danger');
+          await mostrarListaTransportes(); // Re-render to clear any old optimized route
+      }
+  });
+
+  // Event listener for Reset Optimized Map button
+  document.getElementById('btn-reset-optimizado').addEventListener('click', async () => {
+      currentOptimizedRouteData = null; // Clear the optimized data
+      await mostrarListaTransportes(); // Re-render to show non-optimized view
+      actualizarResultado('Vista del mapa restablecida a la ruta actual.', 'info');
+  });
+
+
+  // Call initialization functions on window load
+  window.addEventListener('load', async () => {
+      await loadVehicleTypesConfig(); // First load vehicle types (will use fallback if local)
+      mostrarListaTransportes(); // Then display the list and draw map (which depends on loaded types)
+  });
+
+  // Event listener for large map modal
+  fullScreenMapModalEl.addEventListener('shown.bs.modal', () => {
+    // Always destroy and recreate the map in the modal to ensure clean rendering.
+    if (fullScreenMap) {
+        fullScreenMap.remove();
+        fullScreenMap = null;
+    }
+
+    fullScreenMap = L.map('fullScreenMap').setView(map.getCenter(), map.getZoom());
+    
+    // Define base layers for the full screen map
+    const osmFsLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).on('tileerror', function(e) {
+        console.error('Error al cargar un tile del mapa grande (OpenStreetMap):', e);
+    });
+
+    const esriSatFsLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 19
+    }).on('tileerror', function(e) {
+        console.error('Error al cargar un tile del mapa grande (Esri Satellite):', e);
+    });
+
+    // Add layers to full screen map, mirroring what was active in the main map
+    const currentActiveBaseLayer = map.hasLayer(osmLayer) ? osmFsLayer : esriSatFsLayer;
+    currentActiveBaseLayer.addTo(fullScreenMap);
+
+    // Add layer control to the full screen map
+    const baseFsLayers = {
+        "Mapa (OpenStreetMap)": osmFsLayer,
+        "Satélite (Esri Imagery)": esriSatFsLayer
+    };
+    const overlaysFs = {
+        // No overlays definidos por el momento
+    };
+    L.control.layers(baseFsLayers, overlaysFs).addTo(fullScreenMap);
+
+    fullScreenMap.invalidateSize();
+
+    // Clone layers from the small map to the large map
+    // Ensure `currentTruckSlotsCapacity` is available in this scope for load icons
+    const truckCapacityForFullScreenMap = parseInt(truckSlotsInput.value, 10) || 8;
+
+    routeLayers.eachLayer(layer => {
+        if (layer instanceof L.Polyline) {
+            const newPolyline = L.polyline(layer.getLatLngs(), layer.options);
+            if (layer.getPopup()) {
+                newPolyline.bindPopup(layer.getPopup().getContent());
+            }
+            newPolyline.addTo(fullScreenMap);
+        } else if (layer instanceof L.Marker) {
+            // For markers, need to copy the icon options if it's a custom divIcon
+            const markerOptions = {};
+            if (layer.options.icon && layer.options.icon instanceof L.DivIcon) {
+                // To properly copy, we need to recreate the L.divIcon
+                // The `html` content might need special handling if it contains dynamic data like load
+                // For simplicity, directly copy `className`, `html`, `iconSize`.
+                markerOptions.icon = L.divIcon({
+                    className: layer.options.icon.options.className,
+                    html: layer.options.icon.options.html,
+                    iconSize: layer.options.icon.options.iconSize
+                });
+            }
+            const newMarker = L.marker(layer.getLatLng(), markerOptions);
+            if (layer.getPopup()) {
+                newMarker.bindPopup(layer.getPopup().getContent());
+            }
+            newMarker.addTo(fullScreenMap);
+        }
+    });
+
+    if (routeLayers.getBounds().isValid()) {
+        fullScreenMap.fitBounds(routeLayers.getBounds(), { padding: [50, 50] });
+    }
+  });
+
+  // Focus handling and removal of modal map on close
+  fullScreenMapModalEl.addEventListener('hidden.bs.modal', () => {
+    if (fullScreenMap) {
+        fullScreenMap.remove();
+        fullScreenMap = null;
+    }
+    const closeButton = fullScreenMapModalEl.querySelector('.btn-secondary[data-bs-dismiss="modal"]');
+    if (closeButton && document.activeElement === closeButton) {
+        closeButton.blur();
+    }
+    const openMapButton = document.querySelector('[data-bs-target="#fullScreenMapModal"]');
+    if (openMapButton) {
+        openMapButton.focus();
+    } else {
+        document.body.focus();
+    }
+  });
+</script>
+</body>
+</html>
+
+
